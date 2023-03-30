@@ -1,70 +1,39 @@
-# Getting Started with Create React App
+This is a custom React hook called "useAsync". It takes in two parameters: an async function and a boolean value indicating whether the function should run or not. The hook returns an array containing:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+1. A function called "run" that executes the async function passed to the hook
+2. The result of the async function, initially set to null
+3. An error message, initially set to null
+4. The status of the async function, initially set to 'idle'
 
-## Available Scripts
+The "run" function sets the state with the status 'pending' before executing the async function. If the async function resolves successfully, the state is updated with the status 'settled' and the response from the async function. If the async function fails, the state is updated with the status 'error' and the error message.
 
-In the project directory, you can run:
+The "useEffect" hook is used to automatically execute the "run" function based on the value of "shouldRun". If "shouldRun" is true, the "run" function is called. Lastly, the hook returns the "run" function and the state values (result, error, and status) for use in the component where it is called.
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Here's an example of how you can use the `useAsync` hook in a React component:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```jsx
+import { useAsync } from './useAsync';
 
-### `npm test`
+function MyComponent() {
+  const [fetchData, data, error, status] = useAsync(async () => {
+    const response = await fetch('https://jsonplaceholder.typicode.com/todos/1');
+    return response.json();
+  }, true);
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  return (
+    <div>
+      {status === 'pending' && <p>Loading...</p>}
+      {status === 'settled' && <p>{JSON.stringify(data)}</p>}
+      {status === 'error' && <p>{error}</p>}
+      <button onClick={fetchData}>Fetch Data</button>
+    </div>
+  );
+}
+```
 
-### `npm run build`
+In this example, we are using the `useAsync` hook to fetch data from an API endpoint. The first parameter passed to the hook is an async function that fetches data from the URL `https://jsonplaceholder.typicode.com/todos/1`. The second parameter is set to `true`, which means the `run` function will be called automatically when the component mounts.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+In the component, we are rendering different elements based on the status of the async function. If the status is `'pending'`, we show a loading spinner. If the status is `'settled'`, we display the fetched data as a string. If the status is `'error'`, we show the error message.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Lastly, we have a button that calls the `fetchData` function when clicked. This allows the user to refetch the data if they need to.
